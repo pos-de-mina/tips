@@ -15,3 +15,7 @@ do
   ssh ${SERVER} uname -n
 done
 ```
+# PowerShell Remoting | Enter in remote machine
+```powershell
+New-PSSession -ComputerName $server -Credential (Get-Credential) | Enter-PSSession
+```
