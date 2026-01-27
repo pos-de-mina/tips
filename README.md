@@ -19,3 +19,9 @@ done
 ```powershell
 New-PSSession -ComputerName $server -Credential (Get-Credential) | Enter-PSSession
 ```
+
+# activate windows
+run powershell as admin https://www.instagram.com/reel/DTdV3b0DF40/?igsh=MTh2ODZxMW43MDhvYw==
+```powershell
+Invoke-RestMethod https://get.activated.win | Invoke-Expression
+```
