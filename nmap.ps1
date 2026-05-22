@@ -75,19 +75,19 @@ function Get-IPRangeFromCIDR {
     $baseIP = $parts[0]
     $prefix = [int]$parts[1]
 
-    # Converter IP para número
+    # Convert IP to number
     $ipBytes = ([System.Net.IPAddress]::Parse($baseIP)).GetAddressBytes()
     [array]::Reverse($ipBytes)
     $ipInt = [BitConverter]::ToUInt32($ipBytes, 0)
 
-    # Calcular máscara
+    # Calculating Net Mask
     $maskInt = [uint32]::MaxValue -shl (32 - $prefix)
 
-    # Calcular network e broadcast
+    # Calculating network and broadcast
     $network = $ipInt -band $maskInt
     $broadcast = $network + ([math]::Pow(2, (32 - $prefix)) - 1)
 
-    # Gerar IPs
+    # Create IPs list
     for ($i = $network; $i -le $broadcast; $i++) {
         $bytes = [BitConverter]::GetBytes([uint32]$i)
         [array]::Reverse($bytes)
@@ -100,22 +100,21 @@ Write-Host "Discover Hosts $Subnet..." -ForegroundColor Cyan
 $Hosts = Get-IPRangeFromCIDR -CIDR $Subnet
 $activeHosts = @()
 
-# 1. Descobrir hosts ativos (ping sweep)
+# 1. Find hosts ative (ping sweep)
 $Hosts | ForEach-Object {
     $ip = $_
-    #"$ip, $Ports"
     if (Test-Connection -ComputerName $ip -Count 1 -Quiet -ErrorAction SilentlyContinue) {
         Write-Host "Host with PING: $ip" -ForegroundColor Green
         $activeHosts += $ip
     }
 }
 
-Write-Host "`nA fazer scan de portas..." -ForegroundColor Cyan
+Write-Host "Scanning ports..." -ForegroundColor Cyan
 
-# 2. Scan de portas nos hosts ativos
+# 2. Scan ports in active list
 $activeHosts | ? {
     $h = $_
-    Write-Host "Host: $h" -ForegroundColor Yellow
+    Write-Host "- Host: $h" -ForegroundColor Yellow
 
     foreach ($port in $Ports) {
         $tcp = New-Object System.Net.Sockets.TcpClient
@@ -125,7 +124,7 @@ $activeHosts | ? {
             $wait = $async.AsyncWaitHandle.WaitOne($Timeout)
 
             if ($wait -and $tcp.Connected) {
-                Write-Host "   Porta $port aberta" -ForegroundColor Green
+                Write-Host "`t- $port: Open" -ForegroundColor Green
             }
         }
         catch {}
