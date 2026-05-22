@@ -124,7 +124,7 @@ $activeHosts | ? {
             $wait = $async.AsyncWaitHandle.WaitOne($Timeout)
 
             if ($wait -and $tcp.Connected) {
-                Write-Host "`t- $port: Open" -ForegroundColor Green
+                Write-Host "`t- $($port): Open" -ForegroundColor Green
             }
         }
         catch {}
